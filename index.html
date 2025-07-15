@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Archivo Destino Andalucía</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    input[type=text], select { width: 300px; padding: 8px; margin-right: 10px; }
+    button { padding: 8px 12px; }
+    table { border-collapse: collapse; margin-top: 20px; width: 100%; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; vertical-align: top; }
+    th { background: #eee; }
+    mark { background-color: yellow; font-weight: bold; }
+    #mensaje { margin-top: 10px; font-style: italic; }
+  </style>
+</head>
+<body>
+
+<h1>Archivo Destino Andalucía</h1>
+
+<input type="text" id="busqueda" placeholder="Introduce palabra o frase..." />
+<select id="campo">
+  <option value="todos">Todos los campos</option>
+  <option value="REPORTAJE">Título del reportaje</option>
+  <option value="TEXTO GUION">Texto del guion</option>
+  <option value="LOCALIZACIONES">Localizaciones</option>
+</select>
+<button onclick="buscar()">Buscar</button>
+<button onclick="limpiar()">Limpiar</button>
+
+
+<div id="mensaje"></div>
+
+<table id="resultados" style="display:none;">
+  <thead>
+    <tr>
+      <th>Reportaje</th>
+      <th>Año</th>
+      <th>Mes</th>
+      <th>Estación</th>
+      <th>Localizaciones</th>
+      <th>Texto</th>
+      <th>Enlace Guion</th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
+
+<script>
+const WEBAPP_URL = "https://script.google.com/macros/s/AKfycbwD8KhDFlsRS-P5i8n28Kc9BLpyL9C--g8C4ef1_GBm-ZFuIrNKjNMcFv258R8vp_Mnhw/exec";
+
+function resaltar(texto, palabras) {
+  const escapedWords = palabras.map(p => p.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+  const regex = new RegExp('(' + escapedWords.join('|') + ')', 'gi');
+  return texto.replace(regex, '<mark>$1</mark>');
+}
+  function limpiar() {
+  document.getElementById('busqueda').value = '';
+  document.getElementById('mensaje').textContent = '';
+  document.querySelector('#resultados tbody').innerHTML = '';
+  document.getElementById('resultados').style.display = 'none';
+}
+async function buscar() {
+  const query = document.getElementById('busqueda').value.trim();
+  const campo = document.getElementById('campo').value;
+  const mensaje = document.getElementById('mensaje');
+  const tabla = document.getElementById('resultados');
+  const tbody = tabla.querySelector('tbody');
+
+  tbody.innerHTML = '';
+  tabla.style.display = 'none';
+  mensaje.innerText = '';
+
+  if (!query) {
+    alert('Introduce una palabra o frase para buscar.');
+    return;
+  }
+
+  mensaje.innerText = 'Buscando...';
+
+  try {
+    const res = await fetch(`${WEBAPP_URL}?q=${encodeURIComponent(query)}&campo=${encodeURIComponent(campo)}`);
+    const resultados = await res.json();
+
+    if (resultados.length === 0) {
+      mensaje.innerText = 'No se encontraron resultados.';
+    } else {
+      const palabras = query.toLowerCase().split(/\s+/);
+      resultados.forEach(r => {
+        let texto = r["TEXTO GUION"] || "";
+        const idx = texto.toLowerCase().indexOf(palabras[0]);
+        let contexto = texto;
+
+        if (idx !== -1) {
+          const start = Math.max(0, idx - 80);
+          const end = Math.min(texto.length, idx + 80);
+          contexto = texto.substring(start, end);
+        } else {
+          contexto = texto.substring(0, 200);
+        }
+
+        contexto = resaltar(contexto, palabras);
+
+        tbody.innerHTML += `
+  <tr>
+    <td>${r["REPORTAJE"]}</td>
+    <td>${r["AÑO"]}</td>
+    <td>${r["MES"]}</td>
+    <td>${r["ESTACION"]}</td>
+    <td>${resaltar(r["LOCALIZACIONES"] || "", palabras)}</td>
+    <td>${contexto}...</td>
+    <td><a href="${r["ENLACE"]}" target="_blank">Abrir Guion</a></td>
+  </tr>
+`;
+
+      });
+      tabla.style.display = 'table';
+      mensaje.innerText = '';
+    }
+  } catch (error) {
+    mensaje.innerText = 'Error al realizar la búsqueda.';
+    console.error(error);
+  }
+  
+
+}
+
+
+</script>
+
+</body>
+</html>

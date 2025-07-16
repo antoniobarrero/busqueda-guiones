@@ -3,11 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Buscador de Guiones ‑ Digitsuit</title>
-
-  <!-- Fuente moderna -->
+  <title>Archivo Destino Andalucía</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
-
   <style>
     body {
       margin: 0;
@@ -29,11 +26,11 @@
       margin-bottom: 30px;
     }
     header img {
-      max-height: 120px;
+      max-height: 100px;
+      max-width: 90%;
     }
-    h1 {
-      font-size: 1.8rem;
-      margin: 0;
+    h1, h2 {
+      text-align: center;
       color: #2a3f5d;
     }
     .search-box {
@@ -43,33 +40,24 @@
       box-shadow: 0 2px 6px rgba(0,0,0,0.05);
       display: flex;
       flex-wrap: wrap;
+      gap: 10px;
       justify-content: center;
       align-items: center;
       margin-bottom: 30px;
     }
-    .search-box input[type="text"] {
-      flex: 1 1 300px;
+    .search-box input[type="text"],
+    .search-box select,
+    .search-box button {
+      flex: 1 1 200px;
       padding: 12px 15px;
-      margin: 5px;
+      font-size: 1rem;
       border: 1px solid #ccc;
       border-radius: 6px;
-      font-size: 1rem;
-    }
-    .search-box select {
-      padding: 12px;
-      margin: 5px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      font-size: 1rem;
     }
     .search-box button {
-      padding: 12px 20px;
-      margin: 5px;
-      border: none;
-      border-radius: 6px;
       background-color: #005b9f;
       color: #fff;
-      font-size: 1rem;
+      border: none;
       cursor: pointer;
     }
     .search-box button:hover {
@@ -81,8 +69,12 @@
       font-style: italic;
       color: #555;
     }
+    .table-wrapper {
+      overflow-x: auto;
+    }
     table {
       width: 100%;
+      min-width: 800px;
       border-collapse: collapse;
       background: #fff;
       box-shadow: 0 2px 6px rgba(0,0,0,0.05);
@@ -115,6 +107,19 @@
     }
     a:hover {
       text-decoration: underline;
+    }
+    footer {
+      text-align: center;
+      margin: 40px 0 20px;
+      color: #666;
+      font-size: 0.9em;
+    }
+
+    @media (max-width: 768px) {
+      .search-box {
+        flex-direction: column;
+        align-items: stretch;
+      }
     }
   </style>
 </head>

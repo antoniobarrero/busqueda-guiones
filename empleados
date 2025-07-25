@@ -1,119 +1,76 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
   <title>Buscador de Reportajes</title>
-  <style>
-    body { font-family: Arial, sans-serif; padding: 20px; max-width: 800px; margin: auto; }
-    label { margin-top: 10px; display: block; font-weight: bold; }
-    input, select, button { width: 100%; padding: 8px; margin-top: 5px; box-sizing: border-box; }
-    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-    th, td { border: 1px solid #ccc; padding: 6px; text-align: left; }
-    th { background-color: #f2f2f2; }
-    button { margin-top: 15px; background-color: #007bff; color: white; border: none; cursor: pointer; }
-    button:hover { background-color: #0056b3; }
-  </style>
 </head>
 <body>
+  <h1>Buscador de reportajes</h1>
 
-  <h2>Buscador de Reportajes</h2>
-
-  <label for="reportaje">Buscar en Reportaje:</label>
-  <input type="text" id="reportaje">
-
-  <label for="temporada">Temporada:</label>
-  <select id="temporada"><option value="">-- Todas --</option></select>
-
-  <label for="redactora">Redactora:</label>
-  <select id="redactora"><option value="">-- Todas --</option></select>
-
-  <label for="ciudad">Ciudad:</label>
-  <select id="ciudad"><option value="">-- Todas --</option></select>
-
-  <label for="disco">Disco:</label>
-  <select id="disco"><option value="">-- Todos --</option></select>
-
+  <input type="text" id="buscar" placeholder="Escribe palabras clave..." />
   <button onclick="buscar()">Buscar</button>
-
-  <table id="resultados">
-    <thead></thead>
-    <tbody></tbody>
-  </table>
+  <p id="estado"></p>
+  <div id="resultados"></div>
 
   <script>
-    const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbwiTil2CLVbnXsdAQ-lqHXC3AT0iVwF1LCi50ZrXPVpOAT0H8L2dx9sJ6GokFQVpy3B/exec';
-
-    async function cargarFiltros() {
-      const response = await fetch(WEBAPP_URL + '?action=filtros');
-      const data = await response.json();
-      llenarSelect('temporada', data.temporada);
-      llenarSelect('redactora', data.redactora);
-      llenarSelect('ciudad', data.ciudad);
-      llenarSelect('disco', data.disco);
-    }
-
-    function llenarSelect(id, opciones) {
-      const select = document.getElementById(id);
-      opciones.forEach(op => {
-        const option = document.createElement("option");
-        option.value = op;
-        option.textContent = op;
-        select.appendChild(option);
-      });
-    }
+    const WEBAPP_URL = "https://script.google.com/macros/s/AKfycbxVHjJ0U-x8CHimQBt4_2SCgG7mJDF8NFYmfz4eVteUh7bD42KV6vjUVCOhGOLF36rg/exec";
 
     async function buscar() {
-      const filtros = {
-        reportaje: document.getElementById('reportaje').value,
-        temporada: document.getElementById('temporada').value,
-        redactora: document.getElementById('redactora').value,
-        ciudad: document.getElementById('ciudad').value,
-        disco: document.getElementById('disco').value,
-      };
+      const texto = document.getElementById("buscar").value;
+      const estado = document.getElementById("estado");
+      const resultadosDiv = document.getElementById("resultados");
 
-      const response = await fetch(WEBAPP_URL, {
-        method: 'POST',
-        body: JSON.stringify(filtros),
-        headers: { 'Content-Type': 'application/json' },
-      });
-
-      const datos = await response.json();
-      mostrarResultados(datos);
-    }
-
-    function mostrarResultados(datos) {
-      const thead = document.querySelector('#resultados thead');
-      const tbody = document.querySelector('#resultados tbody');
-      thead.innerHTML = '';
-      tbody.innerHTML = '';
-
-      if (datos.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="8">No se encontraron resultados</td></tr>';
+      if (!texto.trim()) {
+        alert("Escribe algo para buscar");
         return;
       }
 
-      // Cabeceras
-      thead.innerHTML = `
-        <tr>
-          <th>Temporada</th>
-          <th>Programa</th>
-          <th>Fecha</th>
-          <th>Redactora</th>
-          <th>Reportaje</th>
-          <th>Duración</th>
-          <th>Ciudad</th>
-          <th>Disco</th>
-        </tr>
-      `;
+      estado.textContent = "Buscando...";
+      resultadosDiv.innerHTML = "";
 
-      datos.forEach(fila => {
-        const filaHTML = fila.map(d => `<td>${d}</td>`).join('');
-        tbody.innerHTML += `<tr>${filaHTML}</tr>`;
-      });
+      try {
+        const res = await fetch(WEBAPP_URL, {
+          method: "POST",
+          body: JSON.stringify({ texto }),
+          headers: { "Content-Type": "application/json" },
+        });
+
+        const datos = await res.json();
+        estado.textContent = "";
+
+        if (datos.error) {
+          resultadosDiv.innerHTML = `<p style="color:red;">Error: ${datos.error}</p>`;
+          return;
+        }
+
+        if (datos.length === 0) {
+          resultadosDiv.innerHTML = "<p>No se encontraron resultados</p>";
+          return;
+        }
+
+        // Crea tabla con resultados
+        let html = "<table border='1' cellpadding='5'><thead><tr>";
+        Object.keys(datos[0]).forEach(key => {
+          html += `<th>${key}</th>`;
+        });
+        html += "</tr></thead><tbody>";
+
+        datos.forEach(fila => {
+          html += "<tr>";
+          Object.values(fila).forEach(valor => {
+            html += `<td>${valor}</td>`;
+          });
+          html += "</tr>";
+        });
+
+        html += "</tbody></table>";
+        resultadosDiv.innerHTML = html;
+
+      } catch (err) {
+        estado.textContent = "";
+        resultadosDiv.innerHTML = `<p style="color:red;">Error al conectar: ${err.message}</p>`;
+      }
     }
-
-    window.onload = cargarFiltros;
   </script>
 </body>
 </html>

@@ -116,17 +116,48 @@
     a:hover {
       text-decoration: underline;
     }
+    @media print {
+      body {
+        background: #fff !important;
+        color: #000 !important;
+      }
+      .container, table {
+        box-shadow: none !important;
+        background: #fff !important;
+      }
+      .search-box, header, footer, #mensaje {
+        display: none !important;
+      }
+      table {
+        width: 100% !important;
+        font-size: 12px !important;
+        border: 1px solid #333 !important;
+        page-break-inside: avoid;
+      }
+      th, td {
+        padding: 6px !important;
+        border: 1px solid #333 !important;
+      }
+      tr {
+        background: #fff !important;
+        color: #000 !important;
+      }
+      mark {
+        background: #ffeb3b !important;
+        color: #000 !important;
+      }
+    }
   </style>
 </head>
 <body>
 
   <header>
     <!-- Logo del programa cargado desde /img/logo_programa.png -->
-    <img src="https://cdn2.rtva.interactvty.com/titles/17c71146c6b04953be1bb2d40f1799ed.png" alt="Destino Andalucía" />
+    <img src="https://cdn2.rtva.interactvty.com/titles/17c71146c6b04953be1bb2d40f1799ed.png" alt="Logo del programa" />
   </header>
 
 
-<h2 style="text-align: center; margin-bottom: 10px;">Búsqueda Destino</h2>
+<h2 style="text-align: center; margin-bottom: 10px;">Búsqueda de Archivo</h2>
   <div class="container">
     <div class="search-box">
       <input type="text" id="busqueda" placeholder="Buscar..." />
@@ -138,6 +169,7 @@
       </select>
       <button onclick="buscar()">Buscar</button>
       <button onclick="limpiar()">Limpiar</button>
+      <button onclick="imprimirResultados()">Imprimir</button>
     </div>
 
     <div id="mensaje"></div>
@@ -153,13 +185,14 @@
           <th>Texto</th>
           <th>Enlace Guion</th>
           <th>Vídeo</th>
+          <th>Disco</th>
         </tr>
       </thead>
       <tbody></tbody>
     </table>
   </div>
 <footer style="text-align: center; margin: 40px 0 20px; color: #666; font-size: 0.9em;">
-  &copy; <span id="year"></span> versión 0.6. Técnica Audiovisual Digitsuit. Todos los derechos reservados.
+  &copy; <span id="year"></span> Técnica Audiovisual Digitsuit. Todos los derechos reservados.
 </footer>
   <script>
     const WEBAPP_URL = "https://script.google.com/macros/s/AKfycbwD8KhDFlsRS-P5i8n28Kc9BLpyL9C--g8C4ef1_GBm-ZFuIrNKjNMcFv258R8vp_Mnhw/exec";
@@ -220,6 +253,7 @@
                 <td>${contexto}...</td>
                 <td><a href="${r["ENLACE"]}" target="_blank">Abrir</a></td>
                 <td>${r["VÍDEO"] ? `<a href="${r["VÍDEO"]}" target="_blank">Ver vídeo</a>` : ''}</td>
+                <td>${r["DISCO"] || ''}</td>
               </tr>
             `;
           });
@@ -237,6 +271,15 @@
   }
 });
 document.getElementById('year').textContent = new Date().getFullYear();
+
+    function imprimirResultados() {
+      const tabla = document.getElementById('resultados');
+      if (tabla.style.display === 'none' || tabla.querySelector('tbody').innerHTML.trim() === '') {
+        alert('No hay resultados para imprimir.');
+        return;
+      }
+      window.print();
+    }
   </script>
   
 </body>

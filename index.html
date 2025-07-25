@@ -4,7 +4,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Buscador de Guiones ‑ Digitsuit</title>
+
+  <!-- Fuente moderna -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+
   <style>
     body {
       margin: 0;
@@ -14,7 +17,7 @@
       color: #333;
     }
     .container {
-      max-width: 1000px;
+      max-width: 1200px;
       margin: 0 auto;
       padding: 20px;
     }
@@ -23,42 +26,50 @@
       padding: 20px 0;
       text-align: center;
       box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-      margin-bottom: 20px;
+      margin-bottom: 30px;
     }
     header img {
-      max-height: 100px;
-      width: auto;
+      max-height: 120px;
     }
-    h2 {
-      text-align: center;
-      margin-bottom: 20px;
-      font-size: 1.6rem;
+    h1 {
+      font-size: 1.8rem;
+      margin: 0;
       color: #2a3f5d;
     }
     .search-box {
       background: #fff;
-      padding: 15px;
+      padding: 20px;
       border-radius: 8px;
       box-shadow: 0 2px 6px rgba(0,0,0,0.05);
       display: flex;
       flex-wrap: wrap;
-      justify-content: space-between;
-      gap: 10px;
-      margin-bottom: 20px;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 30px;
     }
-    .search-box input[type="text"],
-    .search-box select,
-    .search-box button {
-      font-size: 1rem;
-      padding: 10px;
-      flex: 1 1 200px;
-      border-radius: 6px;
+    .search-box input[type="text"] {
+      flex: 1 1 300px;
+      padding: 12px 15px;
+      margin: 5px;
       border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 1rem;
+    }
+    .search-box select {
+      padding: 12px;
+      margin: 5px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 1rem;
     }
     .search-box button {
+      padding: 12px 20px;
+      margin: 5px;
+      border: none;
+      border-radius: 6px;
       background-color: #005b9f;
       color: #fff;
-      border: none;
+      font-size: 1rem;
       cursor: pointer;
     }
     .search-box button:hover {
@@ -70,10 +81,6 @@
       font-style: italic;
       color: #555;
     }
-    .table-wrapper {
-      overflow-x: auto;
-      width: 100%;
-    }
     table {
       width: 100%;
       border-collapse: collapse;
@@ -81,13 +88,11 @@
       box-shadow: 0 2px 6px rgba(0,0,0,0.05);
       border-radius: 8px;
       overflow: hidden;
-      min-width: 800px;
     }
     th, td {
-      padding: 10px;
+      padding: 12px;
       text-align: left;
       border-bottom: 1px solid #eee;
-      font-size: 0.95rem;
     }
     th {
       background-color: #e3eaf2;
@@ -111,32 +116,8 @@
     a:hover {
       text-decoration: underline;
     }
-    footer {
-      text-align: center;
-      margin: 40px 0 20px;
-      color: #666;
-      font-size: 0.9em;
-    }
-
-    @media (max-width: 600px) {
-      .search-box {
-        flex-direction: column;
-        align-items: stretch;
-      }
-      .search-box input,
-      .search-box select,
-      .search-box button {
-        width: 100%;
-        font-size: 1rem;
-      }
-      table {
-        font-size: 0.85rem;
-      }
-    }
   </style>
 </head>
-<div class="table-wrapper">
-  <table id="resultados" style="display:none;">
 <body>
 
   <header>
@@ -259,6 +240,4 @@ document.getElementById('year').textContent = new Date().getFullYear();
   </script>
   
 </body>
-    </table>
-</div>
 </html>

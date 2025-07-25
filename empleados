@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Buscador de Reportajes</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; max-width: 800px; margin: auto; }
+    label { margin-top: 10px; display: block; font-weight: bold; }
+    input, select, button { width: 100%; padding: 8px; margin-top: 5px; box-sizing: border-box; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { border: 1px solid #ccc; padding: 6px; text-align: left; }
+    th { background-color: #f2f2f2; }
+    button { margin-top: 15px; background-color: #007bff; color: white; border: none; cursor: pointer; }
+    button:hover { background-color: #0056b3; }
+  </style>
+</head>
+<body>
+
+  <h2>Buscador de Reportajes</h2>
+
+  <label for="reportaje">Buscar en Reportaje:</label>
+  <input type="text" id="reportaje">
+
+  <label for="temporada">Temporada:</label>
+  <select id="temporada"><option value="">-- Todas --</option></select>
+
+  <label for="redactora">Redactora:</label>
+  <select id="redactora"><option value="">-- Todas --</option></select>
+
+  <label for="ciudad">Ciudad:</label>
+  <select id="ciudad"><option value="">-- Todas --</option></select>
+
+  <label for="disco">Disco:</label>
+  <select id="disco"><option value="">-- Todos --</option></select>
+
+  <button onclick="buscar()">Buscar</button>
+
+  <table id="resultados">
+    <thead></thead>
+    <tbody></tbody>
+  </table>
+
+  <script>
+    const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbwiTil2CLVbnXsdAQ-lqHXC3AT0iVwF1LCi50ZrXPVpOAT0H8L2dx9sJ6GokFQVpy3B/exec';
+
+    async function cargarFiltros() {
+      const response = await fetch(WEBAPP_URL + '?action=filtros');
+      const data = await response.json();
+      llenarSelect('temporada', data.temporada);
+      llenarSelect('redactora', data.redactora);
+      llenarSelect('ciudad', data.ciudad);
+      llenarSelect('disco', data.disco);
+    }
+
+    function llenarSelect(id, opciones) {
+      const select = document.getElementById(id);
+      opciones.forEach(op => {
+        const option = document.createElement("option");
+        option.value = op;
+        option.textContent = op;
+        select.appendChild(option);
+      });
+    }
+
+    async function buscar() {
+      const filtros = {
+        reportaje: document.getElementById('reportaje').value,
+        temporada: document.getElementById('temporada').value,
+        redactora: document.getElementById('redactora').value,
+        ciudad: document.getElementById('ciudad').value,
+        disco: document.getElementById('disco').value,
+      };
+
+      const response = await fetch(WEBAPP_URL, {
+        method: 'POST',
+        body: JSON.stringify(filtros),
+        headers: { 'Content-Type': 'application/json' },
+      });
+
+      const datos = await response.json();
+      mostrarResultados(datos);
+    }
+
+    function mostrarResultados(datos) {
+      const thead = document.querySelector('#resultados thead');
+      const tbody = document.querySelector('#resultados tbody');
+      thead.innerHTML = '';
+      tbody.innerHTML = '';
+
+      if (datos.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8">No se encontraron resultados</td></tr>';
+        return;
+      }
+
+      // Cabeceras
+      thead.innerHTML = `
+        <tr>
+          <th>Temporada</th>
+          <th>Programa</th>
+          <th>Fecha</th>
+          <th>Redactora</th>
+          <th>Reportaje</th>
+          <th>Duración</th>
+          <th>Ciudad</th>
+          <th>Disco</th>
+        </tr>
+      `;
+
+      datos.forEach(fila => {
+        const filaHTML = fila.map(d => `<td>${d}</td>`).join('');
+        tbody.innerHTML += `<tr>${filaHTML}</tr>`;
+      });
+    }
+
+    window.onload = cargarFiltros;
+  </script>
+</body>
+</html>
